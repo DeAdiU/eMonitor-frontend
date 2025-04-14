@@ -1,103 +1,112 @@
-import Image from "next/image";
+'use client'
+import { useEffect, useState } from 'react';
+import Leetcode from './student/Leetcode/Leetcode'; // Make sure this path is correct
+import withAuth from '@/hoc/withAuth'; // Make sure this path is correct
+import { CategoryBox } from '@/components/CategoryBox'; // Make sure this path is correct
+import { useRouter } from 'next/navigation';
+import Codechef from './student/Codechef/CodeChef';
+import { Code } from 'lucide-react';
+import CodeforcesStats from './student/Codeforces/Codeforces';
 
-export default function Home() {
+const Home = () => {
+  const [activeTab, setActiveTab] = useState('LeetCode');
+  const router = useRouter();
+  // selectedPerson will hold the full person object received from CategoryBox, or null
+  const [selectedPerson, setSelectedPerson] = useState(null);
+
+  // This handler receives the full person object (or null) from CategoryBox
+  const handlePersonSelect = (person) => {
+    console.log("Selected person object in Home:", person); // Optional: for debugging
+    setSelectedPerson(person);
+  };
+
+  // Determine the ID to pass to Leetcode
+  const personIdForLeetcode = selectedPerson ? selectedPerson.id : null;
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="min-h-screen bg-white text-gray-900">
+      <main className="p-6 max-w-7xl mx-auto">
+        {/* Header Section */}
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold text-indigo-900">Dashboard</h1>
+          <div className="flex items-center space-x-2">
+            {/* Pass the handler to CategoryBox */}
+            <CategoryBox onSelect={handlePersonSelect} />
+          </div>
         </div>
+
+        {/* Tabs */}
+        <div className="flex space-x-4 mb-6 border-b border-gray-200">
+          {['LeetCode', 'CodeChef', 'Codeforces', 'GitHub'].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`pb-2 ${
+                activeTab === tab
+                  ? 'text-indigo-600 border-b-2 border-indigo-600'
+                  : 'text-gray-600 hover:text-indigo-600'
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+
+        {/* --- START: Added Selected Student Info Section --- */}
+        {selectedPerson && (
+          <div className="mb-6 p-4 bg-indigo-50 border border-indigo-200 rounded-lg shadow-sm">
+            <h2 className="text-xl font-semibold text-indigo-800 mb-2">
+              Student Profile
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1 text-sm text-gray-700">
+              <p><span className="font-medium text-gray-900">Name:</span> {selectedPerson.first_name} {selectedPerson.last_name}</p>
+              <p><span className="font-medium text-gray-900">Username:</span> {selectedPerson.username}</p>
+              <p><span className="font-medium text-gray-900">Email:</span> {selectedPerson.email}</p>
+              <p><span className="font-medium text-gray-900">Role:</span> {selectedPerson.role}</p>
+              <p><span className="font-medium text-gray-900">Enrollment Year:</span> {selectedPerson.enrollment_year}</p>
+              <p><span className="font-medium text-gray-900">Graduation Year:</span> {selectedPerson.graduation_year}</p>
+              {/* Add other fields as needed */}
+              {/* <p><span className="font-medium text-gray-900">Phone:</span> {selectedPerson.phone_number}</p> */}
+              {/* <p><span className="font-medium text-gray-900">Verified:</span> {selectedPerson.is_verified ? 'Yes' : 'No'}</p> */}
+            </div>
+          </div>
+        )}
+        {/* --- END: Added Selected Student Info Section --- */}
+
+
+        {/* Tab Content */}
+        {/* Leetcode component still receives only the ID */}
+        {activeTab === 'LeetCode' && (
+          <>
+            <Leetcode id={personIdForLeetcode} />
+          </>
+        )}
+
+        {activeTab === 'CodeChef' && (
+          <>
+            <Codechef id={personIdForLeetcode} />
+          </>
+        )}
+
+        {activeTab === 'Codeforces' && (
+          <>
+            <CodeforcesStats id={personIdForLeetcode} />
+          </>
+        )}
+
+        {activeTab === 'GitHub' && (
+          <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
+            <h2 className="text-lg font-semibold text-indigo-900 mb-4">GitHub Stats</h2>
+             {/* Pass ID if GitHub component needs it */}
+            {/* <GitHubComponent id={personIdForLeetcode} /> */}
+            <p className="text-gray-600">GitHub data coming soon...</p>
+             {/* Display message if no student selected */}
+             {!selectedPerson && <p className="text-gray-500 mt-2">Select a student to view GitHub stats.</p>}
+          </div>
+        )}
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
     </div>
   );
-}
+};
+
+export default withAuth(Home);

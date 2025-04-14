@@ -1,106 +1,61 @@
-'use client'
+"use client"
 
-import Link from "next/link"
-import { useState } from "react"
-import { Menu, X, User, LayoutDashboard, BarChart2, BookOpen } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { ModeToggle } from "@/components/toggleTheme"
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet"
-import UserNav from "./userNav"
+import { Search, Menu, X } from 'lucide-react';
+import { useState } from 'react';
+import UserNav from './userNav';
 
-export function Navbar() {
-  const [isOpen, setIsOpen] = useState(false)
-
-  const NavLinks = [
-    { 
-      href: "/dashboard", 
-      label: "Dashboard", 
-      icon: <LayoutDashboard className="mr-2 h-4 w-4" /> 
-    },
-    { 
-      href: "/analytics", 
-      label: "Analytics", 
-      icon: <BarChart2 className="mr-2 h-4 w-4" /> 
-    },
-    { 
-      href: "/courses", 
-      label: "Courses", 
-      icon: <BookOpen className="mr-2 h-4 w-4" /> 
-    }
-  ]
+export default function Navbar() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50">
-      {/* Blurry Background */}
-      <div className="absolute inset-0 bg-background/10 backdrop-blur supports-[backdrop-filter]:bg-background/20 z-[-1]"></div>
-      
-      <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-        {/* Logo */}
-        <Link href="/" className="flex items-center space-x-2">
-          <span className="text-2xl font-bold text-primary">eMonitor</span>
-        </Link>
-
-        {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center space-x-4">
-          {NavLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="flex items-center text-md font-semibold text-muted-foreground hover:text-primary transition-colors"
-            >
-              {link.icon}
-              {link.label}
-            </Link>
-          ))}
-
-          <div className="flex items-center space-x-4 ml-4">
-            <ModeToggle />
-            <UserNav/>
+    <nav className="bg-indigo-50 p-4 shadow-sm">
+      <div className="max-w-7xl mx-auto">
+        {/* Desktop navbar */}
+        <div className="hidden md:flex justify-between items-center">
+          <div className="flex space-x-4">
+            <a href="/" className="text-indigo-700 hover:text-indigo-900">Dashboard</a>
+            <a href="/assessment" className="text-indigo-700 hover:text-indigo-900">Assessment</a>
+            <a href="/leaderboard" className="text-indigo-700 hover:text-indigo-900">Leaderboard</a>
+            <a href="/profile" className="text-indigo-700 hover:text-indigo-900">Profile</a>
+          </div>
+          <div className="flex items-center space-x-4">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search..."
+                className="pl-8 pr-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+              <Search className="absolute left-2 top-2.5 h-5 w-5 text-gray-400" />
+            </div>
+            <UserNav />
           </div>
         </div>
-
-        {/* Mobile Navigation */}
-        <div className="md:hidden flex items-center space-x-2">
-          <ModeToggle />
-          <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="icon">
-                {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="min-size-120px bg-background/60 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
-              <SheetHeader>
-                <SheetTitle className="text-2xl font-bold">eMonitor</SheetTitle>
-              </SheetHeader>
-              <div className="grid gap-2 py-4">
-                {NavLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className="flex font-semibold items-center p-2 mx-3 my-1 hover:bg-accent rounded-md"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    {link.icon}
-                    {link.label}
-                  </Link>
-                ))}
-              </div>
-              <div className="mt-4 border-t pt-4">
-                <div className="flex items-center space-x-4">
-                
-                </div>
-              </div>
-            </SheetContent>
-          </Sheet>
+        
+        {/* Mobile navbar */}
+        <div className="md:hidden flex justify-between items-center">
+          <button 
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="text-indigo-700 hover:text-indigo-900"
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+          >
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+          
+          <div className="flex items-center space-x-2">
+            <UserNav />
+          </div>
         </div>
+        
+        {/* Mobile menu dropdown */}
+        {isMenuOpen && (
+          <div className="md:hidden pt-4 pb-2 space-y-2 flex flex-col">
+            <a href="/" className="text-indigo-700 hover:text-indigo-900 py-2">Dashboard</a>
+            <a href="/assessment" className="text-indigo-700 hover:text-indigo-900 py-2">Assessment</a>
+            <a href="/leaderboard" className="text-indigo-700 hover:text-indigo-900 py-2">Leaderboard</a>
+            <a href="/profile" className="text-indigo-700 hover:text-indigo-900 py-2">Profile</a>
+          </div>
+        )}
       </div>
     </nav>
-  )
+  );
 }
